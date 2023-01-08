@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect
 import json, random
-from . import globalconstants
-from urllib.request import urlopen
+from google.cloud import storage
 
 views = Blueprint('views', __name__)
 
@@ -24,10 +23,16 @@ def game():
             return redirect("/game")
         print(already_asked)
 
-    q_f = urlopen("https://storage.cloud.google.com/nikalodean.appspot.com/qa.json")
-    m_f = urlopen("https://storage.cloud.google.com/nikalodean.appspot.com/mm.json")
-    q_data = json.loads(q_f.read())
-    m_data = json.loads(m_f.read())
+    storage_client = storage.Client("nikalodean")
+    bucket = storage_client.bucket("nikalodean.appspot.com")
+    q_blob = bucket.blob("qa.json")
+    m_blob = bucket.blob("mm.json")
+
+    with q_blob.open("r") as q_f:
+        q_data = json.loads(q_f.read())
+
+    with m_blob.open("r") as m_f:
+        m_data = json.loads(m_f.read())
 
     all_answered = False
     for i in range(10):
