@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "ques": "Out of the following what should you never bring on your first date?",
+    "options": {
+      "Shilajit": false,
+      "A Gift": "msg01",
+      "Your mum": false,
+      "Ultimate Hot Wheels Garage Robo T-Rex Playset": true
+    }
+  },
+  {
+    "id": 2,
+    "ques": "Easiest way to my heart is.....",
+    "options": {
+      "69": "msg02",
+      "Surgery": true,
+      "Giyaan singing Mai hoon Giyaan": false,
+      "Love and Care": false
+    }
+  },
+  {
+    "id": 3,
+    "ques": "Complete the sentense -> Vickky Don _______",
+    "options": {
+      "Kedi Cheej": true,
+      "Kadak Cheej": false,
+      "Thara Bhai": "msg03",
+      "Daulat ko bhooko": false
+    }
+  }
+]

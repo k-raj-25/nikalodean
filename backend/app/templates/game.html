@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nikalodean</title>
+    <link rel="icon" type="image/x-icon" href="/static/img/icon.png">
+    <link href='https://fonts.googleapis.com/css?family=Caveat' rel='stylesheet'>
+		<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&family=Yeon+Sung&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet">
+    <link href="static/custom.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container main">
+      <div class="sub-heading">
+        <h2 class="text-center" id="question" style="font-size: 38px;">{{ data.ques }}</h2>
+      </div>
+
+			{% if data.options is not false %}
+      <div class="row" id="options">
+        {% for option in data.options.keys() %}
+        <div class="col-md-12">
+          <center><a type="button" class="btn btn-outline-warning btn-lg option-btn option-buttons" href="javascript:void(0)">{{ option }}</a></center>
+        </div>
+        {% endfor %}
+      </div>
+
+			<form action="/game" method="POST" id="ques_form">
+        <input type="text" name="already_asked" value="{{ data.already_asked }}" hidden />
+        <input type="text" name="answer" id="answer" value="" hidden />
+        <input type="text" name="score" id="score" value="{{ data.score }}" hidden />
+      </form>
+
+			<div class="modal" id="memeModal" tabindex="-1" aria-labelledby="memeModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" style="color:black;">Seriously You Chose This Option!!!</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							{% if data.msgs.msg != "" %}
+							<h2 style="color:black;">{{ data.msgs.msg }}</h2>
+							{% else %}
+							<img src="{{ data.msgs.url }}" width="100%" height="100%" />
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+			{% else %}
+			<center><a type="button" class="btn btn-outline-warning btn-lg option-btn" href="/game">Restart</a></center>
+			{% endif %}
+			<div class="score-div text-center">
+				<div class="row">
+					<div class="col-3">
+						<div class="circle-btn"><i class="fa-solid fa-house fa-2xs" style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);"></i></div>
+					</div>
+					<div class="col-9">
+						<h2 style="margin-bottom: 0px;">SCORE: {{ data.score }}</h2>
+					</div>
+				</div>
+			</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+
+    <script>
+			$(".option-buttons").click(function(){
+				var ans = $(this).text();
+				var data = $.parseJSON('{{ data|tojson|safe }}');
+				var th = $(this);
+				console.log(data)
+
+				if (data.options[ans] == true) {
+					// Correct answer
+					console.log("You Win")
+					isTrue(th);
+				} else if (typeof data.options[ans] === 'string' || data.options[ans] instanceof String) {
+					// Open modal with msg or meme
+					console.log("Show Meme")
+					$("#memeModal").modal('toggle');
+				} else {
+					// Show try again error
+					console.log("You Lose")
+					isFalse(th);
+				}
+			});
+
+			$(".circle-btn").click(function() {
+				window.location.href = "/";
+			});
+
+			function isTrue(th) {
+				console.log("data")
+				$("#answer").val($(th).text());
+				$("#score").val(parseInt($("#score").val())+1);
+				$("#ques_form").submit();
+			}
+
+			function isFalse(th) {
+				console.log("data")
+				$("#options").html("");
+				$("#question").html("You Loser!! hahaha.... restaring in <span id='time' style='color:red;font-size:60px;'>5</span> seconds");
+				var counter = 5;
+				var interval = setInterval(function() {
+						counter--;
+						// Display 'counter' wherever you want to display it.
+						if (counter <= 0) {
+								clearInterval(interval);
+								$("#answer").val($(th).text());
+								$("#score").val(-1);
+								$("#ques_form").submit();
+						}else{
+							$('#time').text(counter);
+							console.log("Timer --> " + counter);
+						}
+				}, 1000);
+			}
+    </script>
+  </body>
+</html>
